@@ -1,0 +1,16 @@
+{
+  "configImportP": {
+    "attributes": {
+      "adminSt": "triggered", 
+      "dn": "uni/fabric/configimp-default", 
+      "fileName": "ce2_pre_NO-TENNANTS-2017-05-23T15-06-19.tar.gz", 
+      "importMode": "atomic", 
+      "importType": "replace", 
+      "name": "default", 
+      "rn": "configimp-default", 
+      "snapshot": "true", 
+      "status": "created,modified"
+    }, 
+    "children": []
+  }
+}
