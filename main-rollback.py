@@ -45,13 +45,6 @@ def take_snapshot(apic, cookies, snapshot_name):
 
 
 def revert_snapshot(apic, cookies, snapshot_name):
-    print("\nPlease check if change was successfull, if not select 'y' to rollback....")
-    print("Note:- If cookie expires you will have to rollback manually via APIC")
-    user_input = input("\nRollback 'y' or 'n' [n]: ")
-    selection = user_input or 'n'
-    if selection.lower() == 'n':
-        pass
-    elif selection.lower() == 'y':
         query = snapsub.Query(apic, cookies)
         query_string = 'configSnapshot'
         query_payload = query.query_class(query_string)
@@ -127,7 +120,13 @@ def main():
     print "Attempting to take snapshot"
     take_snapshot(apic, cookies, snapshot_name)
     # Prompt to see if user wants to rollback to previous snapshot
-    revert_snapshot(apic, cookies, snapshot_name)
+    user_input = input("\nRollback 'y' or 'n' [n]: ")
+    selection = user_input or 'n'
+    # Run the login and load the cookies var
+    cookies = fablogin.login()
+    # Revert only if requested.
+    if selection.lower() == 'y':
+    	revert_snapshot(apic, cookies, snapshot_name)
     # Delete the snapshot policy
     del_snap_pol(apic, cookies, snapshot_name)
     # End
