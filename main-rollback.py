@@ -35,7 +35,7 @@ def take_snapshot(apic, cookies, snapshot_name):
         status = cfgmgmt.backup(snapshot_name, snapshot, status)
         if status == 200:
             print("")
-            print("Snapshot '%s' was taken successfully, you may proceed with Change Request." % (snapshot_name))
+            print("Snapshot '%s' taken successfully, you may proceed with Change Request." % (snapshot_name))
             time.sleep(5)
         else:
             print("")
@@ -51,7 +51,7 @@ def revert_snapshot(apic, cookies, snapshot_name):
         payload_len = len(query_payload[1]['imdata'])
         for x in range(0, payload_len):
             if (query_payload[1]['imdata'][x]['configSnapshot']['attributes']
-                ['fileName'])[4:17] == snapshot_name:
+                ['fileName'])[4:18] == snapshot_name:
                 snapshot_name = (query_payload[1]['imdata'][x]
                                  ['configSnapshot']['attributes']
                                  ['fileName'])
@@ -73,19 +73,19 @@ def collect_addr_cred(addr_cred_old):
     # If any of the address, username or password is empty, collect them interactively
     addr_cred_new = []
     if addr_cred_old[0] == "" or addr_cred_old[0] is None:
-        print("\nAPIC IP address is not defined in the script, please enter it at the prompt")
+        print("\nAPIC IP address is not defined; please enter it at the prompt")
         # addr_cred_new.append(str(input("Address: ")))
         addr_cred_new.append(str(input("Address: ")))
     else:
         addr_cred_new.append(addr_cred_old[0])
     if addr_cred_old[1] == "" or addr_cred_old[1] is None:
-        print("\nAPIC Username is not defined in the script, please enter it at the prompt")
+        print("\nAPIC Username is not defined; please enter it at the prompt")
         # addr_cred_new.append(str(input("Username: ")))
         addr_cred_new.append(str(input("Username: ")))
     else:
         addr_cred_new.append(addr_cred_old[1])
     if addr_cred_old[2] == "" or addr_cred_old[2] is None:
-        print("\nAPIC Password is not defined in the script, please enter it at the prompt")
+        print("\nAPIC Password is not defined; please enter it at the prompt")
         addr_cred_new.append(str(getpass.getpass(prompt="Password: ")))
     else:
         addr_cred_new.append(addr_cred_old[2])
@@ -95,22 +95,26 @@ def main():
     # Disable urllib3 warnings
     requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
     # Static APIC information
-    apic = "10.32.39.221"
-    user = "admin"
-    pword = "password"
+    apic = ""
+    user = ""
+    pword = ""
     # Verify that APIC address, username and password variables are not empty
     addr_cred_static = [apic, user, pword]
     addr_cred_checked = collect_addr_cred(addr_cred_static)
     apic = addr_cred_checked[0]
     user = addr_cred_checked[1]
     pword = addr_cred_checked[2]
-    # get snapshot name and prepend '_pre' to it.
-    snapshot_input = input ("Enter snapshot name (has to be exactly 9 characters) or press return for [rollback1]: ") or "rollback1"
-    snapshot_name = "Pre_" + snapshot_input
-    # check length
-    if len(snapshot_name) <> 13:
-    	print "Sorry needs to be 9 characters!"
-    	sys.exit()
+	# get snapshot name and prepend '_pre' to it.
+    while True:
+	snapshot_input = input ("Please enter Change Reference (all 10 characters) or press return to use [RollBack01]: ") or "RollBack01"
+	# check length
+	if  not len(snapshot_input) == 10:
+		print("Sorry, the filename must be 10 characters in length e.g. 'CHG1234567'")
+		continue
+	else:
+		snapshot_name = "Pre_" + snapshot_input
+		print snapshot_name + " will be used as the snapshot name on ACI."
+		break
     # Initialize the fabric login method, passing appropriate variables
     print "Connecting to Fabric API"
     fablogin = snapsub.FabLogin(apic, user, pword)
